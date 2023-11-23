@@ -1,0 +1,115 @@
+AUTO_RESUME: false
+CUDNN:
+  BENCHMARK: true
+  DETERMINISTIC: false
+  ENABLED: true
+DATA_DIR: ''
+GPUS: (0, 1, 2) # 4
+OUTPUT_DIR: 'output2/'
+LOG_DIR: 'output2/log/'
+WORKERS: 21 #19
+PRINT_FREQ: 100
+
+DATASET:
+  COLOR_RGB: true
+  DATASET: 'coco'
+  DATA_FORMAT: jpg
+  FLIP: true
+  NUM_JOINTS_HALF_BODY: 8
+  PROB_HALF_BODY: 0.3
+  ROOT: '/dataset/coco/'
+  ROT_FACTOR: 45
+  SCALE_FACTOR: 0.35
+  TEST_SET: 'val2017'
+  TRAIN_SET: 'train2017'
+MODEL:
+  INIT_WEIGHTS: true
+  NAME: gaugcn52
+  SIMDR_SPLIT_RATIO: 2.0  # 1D vector big ratio
+  HEAD_INPUT: 3072  # 64*48
+  NUM_JOINTS: 17
+  PRETRAINED: '/dataset/celia/hrnet_pretrain_models_pytorch/imagenet/hrnet_w32-36af842e.pth'
+  # '/dataset/wh/wh_code/SimCC-main/output2/coco/gaugcn5/gaugcn5/checkpoint.pth'
+  COORD_REPRESENTATION: 'sa-simdr3'
+  IMAGE_SIZE:
+  - 192
+  - 256
+  HEATMAP_SIZE:
+  - 192
+  - 256
+  SIGMA: 4
+  EXTRA:
+    PRETRAINED_LAYERS:
+    - 'conv1'
+    - 'bn1'
+    - 'conv2'
+    - 'bn2'
+    - 'layer1'
+    - 'transition1'
+    - 'stage2'
+    - 'transition2'
+    - 'stage3'
+    - 'transition3'
+    FINAL_CONV_KERNEL: 1
+    STAGE2:
+      NUM_MODULES: 1
+      NUM_BRANCHES: 2
+      BLOCK: BASIC
+      NUM_BLOCKS:
+      - 4
+      - 4
+      NUM_CHANNELS:
+      - 32
+      - 64
+      FUSE_METHOD: SUM
+    STAGE3:
+      NUM_MODULES: 4
+      NUM_BRANCHES: 3
+      BLOCK: BASIC
+      NUM_BLOCKS:
+      - 4
+      - 4
+      - 4
+      NUM_CHANNELS:
+      - 32
+      - 64
+      - 128
+      FUSE_METHOD: SUM
+LOSS:
+  USE_TARGET_WEIGHT: true
+  TYPE: 'KLDiscretLoss3'
+TRAIN:
+  BATCH_SIZE_PER_GPU: 80 #76
+  SHUFFLE: true
+  BEGIN_EPOCH: 0
+  END_EPOCH: 210
+  OPTIMIZER: adam
+  LR: 0.001
+  LR_FACTOR: 0.1
+  LR_STEP:
+  - 170
+  - 200
+  WD: 0.0001
+  GAMMA1: 0.99
+  GAMMA2: 0.0
+  MOMENTUM: 0.9
+  NESTEROV: false
+TEST:
+  BATCH_SIZE_PER_GPU: 400 # 608 # 24
+  COCO_BBOX_FILE: '/dataset/coco/person_detection_results/COCO_val2017_detections_AP_H_56_person.json'
+  BBOX_THRE: 1.0
+  IMAGE_THRE: 0.0
+  IN_VIS_THRE: 0.01
+  MODEL_FILE: '/dataset/wh/wh_code/SimCC-main/output/pose_hrnet_w48_256x192_split2_sigma4.pth'
+  NMS_THRE: 1.0
+  OKS_THRE: 0.9
+  USE_GT_BBOX: true
+  FLIP_TEST: true
+  POST_PROCESS: false
+  SHIFT_HEATMAP: true
+DEBUG:
+  DEBUG: false
+  SAVE_BATCH_IMAGES_GT: false
+  SAVE_BATCH_IMAGES_PRED: false
+  SAVE_HEATMAPS_GT: true
+  SAVE_HEATMAPS_PRED: true
